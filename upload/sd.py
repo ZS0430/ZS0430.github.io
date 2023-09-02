@@ -1,10 +1,8 @@
 import json
-import os.path
 from getpass import getpass
 
 import requests
 
-file_save_name = 'creds.txt'
 # 账号信息
 cred = ''
 
@@ -32,6 +30,7 @@ grant_code_url = "https://as.hypergryph.com/user/oauth2/v2/grant"
 
 # 使用认证代码获得cred
 cred_code_url = "https://zonai.skland.com/api/v1/user/auth/generate_cred_by_code"
+
 
 def login_by_token():
     token_code = "AAVM36nfLHmKG0fzSNgP/g6w"
@@ -71,8 +70,7 @@ def get_binding_list():
     if resp['code'] != 0:
         print(f"请求角色列表出现问题：{resp['message']}")
         if resp.get('message') == '用户未登录':
-            print(f'用户登录可能失效了，请重新运行此程序！')
-            os.remove(file_save_name)
+            print(f'用户登录可能失效了，请重新获取token！')
             return []
     for i in resp['data']['list']:
         if i.get('appCode') != 'arknights':
@@ -91,15 +89,18 @@ def do_sign():
         }
         resp = requests.post(sign_url, headers=header, json=body).json()
         if resp['code'] != 0:
-            print(f'角色{i.get("nickName")}({i.get("channelName")})签到失败了！原因：{resp.get("message")}')
+            print(
+                f'角色{i.get("nickName")}({i.get("channelName")})签到失败了！原因：{resp.get("message")}')
             continue
         print(
             f'角色{i.get("nickName")}({i.get("channelName")})签到成功，获得了{resp.get("resource").get("name")}×{resp.get("count")}'
         )
 
+
 def do_init():
     print("使用鹰角网络通行证账号登录")
     login_by_token()
+
 
 try:
     do_init()
@@ -107,4 +108,3 @@ try:
     print("签到完成！")
 except Exception as ex:
     print(f'签到失败，原因：{str(ex)}')
-input()
